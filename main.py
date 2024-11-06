@@ -5,16 +5,29 @@ import random
 import asyncio
 from typing import Optional
 from datetime import datetime, timedelta
+import os
 
 app = FastAPI()
 
+# Get the Railway-provided URL if available
+RAILWAY_STATIC_URL = os.getenv('RAILWAY_STATIC_URL', '*')
+RAILWAY_PUBLIC_DOMAIN = os.getenv('RAILWAY_PUBLIC_DOMAIN', '*')
+
+# Updated CORS middleware with Railway domains
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "*",  # Keep the wildcard for development
+        f"https://{RAILWAY_PUBLIC_DOMAIN}" if RAILWAY_PUBLIC_DOMAIN != '*' else "*",
+        f"https://{RAILWAY_STATIC_URL}" if RAILWAY_STATIC_URL != '*' else "*",
+        # Add any other specific domains you need
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Rest of your existing code remains the same...
 
 class RoomCreate(BaseModel):
     room_name: str
